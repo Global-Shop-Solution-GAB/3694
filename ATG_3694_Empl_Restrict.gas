@@ -1,0 +1,61 @@
+Program.Sub.ScreenSU.Start
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+' Originally for AWI Manufacturing
+' JSO
+' 6/20/2010
+' 16970 (BRWRC055 employee id browser override)
+' 16960 (BRWRC054 employee name browser override)
+
+F.ODBC.Connection!con.OpenConnection(V.Ambient.PDSN,V.Ambient.PUser,V.Ambient.PPass)
+
+Function.intrinsic.control.if(Variable.passed.009000,=,"JB0083")
+	Variable.Passed.777777.Set(1)
+	Function.Intrinsic.Control.CallSub(Custombrowser)
+Function.Intrinsic.Control.EndIf
+
+
+Program.Sub.Main.End
+
+Program.Sub.CustomBrowser.Start
+Variable.Local.sSQL.Declare(String)
+Variable.Local.sEmpl.Declare(String)
+Variable.Local.sName.Declare(String)
+V.Local.sColW.Declare(String)
+V.Local.sCol.Declare(String)
+V.Local.sret.Declare(String)
+
+F.Intrinsic.String.Split("Employee*!*Name","*!*",V.Local.sCol)
+F.Intrinsic.String.split("1000*!*3000","*!*",V.Local.sColW)
+
+V.Local.sSQL.Set("SELECT EMPLOYEE, NAME FROM EMPLOYEE_MSTR WHERE EMPLOYEE NOT IN (SELECT EMPLOYEE FROM ATG_3694_Emp_Exclude)")
+Function.Intrinsic.Control.If(V.Caller.Hook,=,"16960")
+	F.inTRINSIC.String.Concat(V.Local.sSQL," ORDER BY NAME",V.Local.sSQL)
+Function.Intrinsic.Control.Else
+	F.inTRINSIC.String.Concat(V.Local.sSQL," ORDER BY EMPLOYEE",V.Local.sSQL)
+Function.Intrinsic.Control.EndIf
+
+F.Intrinsic.UI.Browser("Select Employee","con",V.local.sSql,V.Local.sCol,V.Local.sColW,2500,6000,V.Local.sret)
+
+F.Intrinsic.Control.If(V.Local.sret,<>,"***CANCEL***")
+	F.Intrinsic.String.Split(V.Local.sret,"*!*",V.Local.sret)
+'	V.Passed.000079.Set(V.Local.sRet(0))
+	V.Passed.009001.Set(V.Local.sret(0))
+	V.Passed.000080.Set(V.local.sRet(1))
+F.Intrinsic.Control.EndIf
+
+Program.Sub.CustomBrowser.End
+
+Program.Sub.Comments.Start
+${$0$}$ATG_3694_Empl_Restrict$}$JCT$}$4/5/2016
+${$1$}$$}$$}$1$}$16970$}$BRWRC055-PROCESS-HOOK (EMPLOYEE BROWSE)$}$4/5/2016 3:26:44 PM$}$(Program: BRWRC054; Screen: BRWRC055)
+
+${$1$}$$}$$}$0$}$16960$}$BRWRC054-PROCESS-HOOK (EMPLOYEE BROWSE)$}$4/5/2016 3:26:11 PM$}$(Program: BRWRC054; Screen: BRWRC054)
+
+Program.Sub.Comments.End
+
